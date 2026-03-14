@@ -1,5 +1,7 @@
 package com.example.weatherapp.ui.lovedcities
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,13 +10,15 @@ import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -59,6 +63,7 @@ val WeatherCardShape = GenericShape { size, _ ->
 }
 
 data class CityWeather(
+    val id: String,
     val temp: Int,
     val high: Int,
     val low: Int,
@@ -71,17 +76,21 @@ data class CityWeather(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LovedCitiesScreen(onBack: () -> Unit) {
-    val cities = listOf(
-        CityWeather(19, 24, 18, "Montreal", "Canada", "Mid Rain", "icons/wind.png"),
-        CityWeather(20, 21, -19, "Toronto", "Canada", "Fast Wind", "icons/cloudy_sun.png"),
-        CityWeather(13, 16, 8, "Tokyo", "Japan", "Showers", "icons/bar2.png")
-    )
+    var cities by remember {
+        mutableStateOf(
+            listOf(
+                CityWeather("1", 19, 24, 18, "Montreal", "Canada", "Mid Rain", "icons/wind.png"),
+                CityWeather("2", 20, 21, -19, "Toronto", "Canada", "Fast Wind", "icons/cloudy_sun.png"),
+                CityWeather("3", 13, 16, 8, "Tokyo", "Japan", "Showers", "icons/bar2.png")
+            )
+        )
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
+                brush = Brush.radialGradient(
                     colors = listOf(Color(0xFF2E335A), Color(0xFF1C1B33))
                 )
             )
@@ -153,8 +162,51 @@ fun LovedCitiesScreen(onBack: () -> Unit) {
                 contentPadding = PaddingValues(20.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(cities) { city ->
-                    WeatherCityCard(city)
+                items(cities, key = { it.id }) { city ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = {
+                            if (it == SwipeToDismissBoxValue.EndToStart) {
+                                cities = cities.filter { it.id != city.id }
+                                true
+                            } else {
+                                false
+                            }
+                        }
+                    )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        backgroundContent = {
+                            val backgroundColor by animateColorAsState(
+                                when (dismissState.targetValue) {
+                                    SwipeToDismissBoxValue.EndToStart -> Color.Red.copy(alpha = 0.8f)
+                                    else -> Color.Transparent
+                                }, label = "color"
+                            )
+                            val scale by animateFloatAsState(
+                                if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f, label = "scale"
+                            )
+
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .clip(WeatherCardShape)
+                                    .background(backgroundColor)
+                                    .padding(horizontal = 20.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier.scale(scale),
+                                    tint = Color.White
+                                )
+                            }
+                        },
+                        enableDismissFromStartToEnd = false
+                    ) {
+                        WeatherCityCard(city)
+                    }
                 }
             }
         }

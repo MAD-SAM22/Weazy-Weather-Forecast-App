@@ -78,7 +78,7 @@ fun WeatherSplashScreen(onSplashFinished: () -> Unit) {
                 modifier = Modifier.alpha(contentAlpha.value)
             ) {
                 Text(
-                    text = "WeatherApp",
+                    text = "Weazy",
                     fontSize = 42.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
