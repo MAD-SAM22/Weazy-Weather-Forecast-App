@@ -1,6 +1,8 @@
 package com.example.weatherapp.di
 
+import androidx.room.Room
 import com.example.weatherapp.data.repository.WeatherRepository
+import com.example.weatherapp.data.source.local.WeatherDatabase
 import com.example.weatherapp.ui.home.HomeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -35,4 +37,12 @@ val viewModelModule = module {
     viewModel { HomeViewModel(get(), get()) }
 }
 
-val appModule = listOf(networkModule, locationModule, repositoryModule, viewModelModule)
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(androidContext(), WeatherDatabase::class.java, "weazy_db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+    single { get<WeatherDatabase>().weatherDao() }
+}
+val appModule = listOf(networkModule, locationModule, repositoryModule, viewModelModule, databaseModule)
