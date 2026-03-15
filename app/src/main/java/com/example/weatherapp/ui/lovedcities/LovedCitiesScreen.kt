@@ -3,6 +3,7 @@ package com.example.weatherapp.ui.lovedcities
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -47,6 +48,7 @@ val WeatherCardShape = GenericShape { size, _ ->
 @Composable
 fun LovedCitiesScreen(
     onBack: () -> Unit,
+    onCitySelected: (String) -> Unit,
     viewModel: LovedCitiesViewModel = koinViewModel()
 ) {
     val lovedCities by viewModel.lovedCities.collectAsState()
@@ -170,7 +172,9 @@ fun LovedCitiesScreen(
                         },
                         enableDismissFromStartToEnd = false
                     ) {
-                        WeatherCityCard(city)
+                        Box(modifier = Modifier.clickable { onCitySelected(city.name) }) {
+                            WeatherCityCard(city)
+                        }
                     }
                 }
             }

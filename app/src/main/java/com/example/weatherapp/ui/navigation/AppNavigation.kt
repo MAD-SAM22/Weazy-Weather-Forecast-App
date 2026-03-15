@@ -29,6 +29,7 @@ private object Routes {
 fun AppNavigation() {
     val context = LocalContext.current
     val navController = rememberNavController()
+    val homeViewModel: HomeViewModel = koinViewModel()
 
     NavHost(navController = navController, startDestination = Routes.SPLASH) {
 
@@ -54,7 +55,6 @@ fun AppNavigation() {
         }
 
         composable(Routes.HOME) {
-            val homeViewModel: HomeViewModel = koinViewModel()
             HomeScreen(
                 viewModel = homeViewModel,
                 onNavigateToCities = { navController.navigate(Routes.LOVED_CITIES) },
@@ -63,7 +63,13 @@ fun AppNavigation() {
         }
 
         composable(Routes.LOVED_CITIES) {
-            LovedCitiesScreen(onBack = { navController.popBackStack() })
+            LovedCitiesScreen(
+                onBack = { navController.popBackStack() },
+                onCitySelected = { city ->
+                    homeViewModel.fetchWeatherData(city)
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Routes.ALERTS) {

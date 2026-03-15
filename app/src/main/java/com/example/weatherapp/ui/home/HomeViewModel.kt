@@ -85,7 +85,7 @@ class HomeViewModel(
     fun addCityToFavorites(city: GeocodingResponseItem) {
         viewModelScope.launch {
             try {
-                val weatherResponse = repository.getWeatherByCity(city.name)
+                val weatherResponse = repository.getCurrentWeatherByCoords(city.lat, city.lon)
                 if (weatherResponse.isSuccessful) {
                     val weather = weatherResponse.body()
                     if (weather != null) {
@@ -95,7 +95,9 @@ class HomeViewModel(
                                 country = city.country,
                                 temp = weather.main.temp,
                                 condition = weather.weather.firstOrNull()?.description ?: "",
-                                icon = mapIconToAsset(weather.weather.firstOrNull()?.icon)
+                                icon = mapIconToAsset(weather.weather.firstOrNull()?.icon),
+                                lat = city.lat,
+                                lon = city.lon
                             )
                         )
                     }
@@ -125,7 +127,9 @@ class HomeViewModel(
                                     country = cityInfo.country,
                                     temp = weather.main.temp,
                                     condition = weather.weather.firstOrNull()?.description ?: "",
-                                    icon = mapIconToAsset(weather.weather.firstOrNull()?.icon)
+                                    icon = mapIconToAsset(weather.weather.firstOrNull()?.icon),
+                                    lat = lat,
+                                    lon = lon
                                 )
                             )
                         }
@@ -137,7 +141,7 @@ class HomeViewModel(
         }
     }
 
-    private fun fetchWeatherData(lat: Double, lon: Double) {
+    fun fetchWeatherData(lat: Double, lon: Double) {
         viewModelScope.launch {
             try {
                 val weatherResponse = repository.getCurrentWeatherByCoords(lat, lon)

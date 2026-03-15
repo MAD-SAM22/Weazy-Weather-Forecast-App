@@ -39,9 +39,6 @@ class LovedCitiesViewModel(
                 }
             }
         }
-        
-        // Mock data seeding if needed for testing (remove in production)
-        seedInitialData()
     }
 
     val lovedCities: StateFlow<List<LovedCityUiModel>> = combine(
@@ -83,20 +80,6 @@ class LovedCitiesViewModel(
                 }
             } catch (e: Exception) {
                 Log.e("LovedCitiesViewModel", "Exception fetching city image", e)
-            }
-        }
-    }
-
-    private fun seedInitialData() {
-        viewModelScope.launch {
-            val count = weatherDao.getFavoriteCities().first().size
-            if (count == 0) {
-                val mockCities = listOf(
-                    FavoriteCityEntity("Montreal", "Canada", 19.0, "Mid Rain", "icons/sun.png"),
-                    FavoriteCityEntity("Toronto", "Canada", 20.0, "Fast Wind", "icons/scoudy_night.png"),
-                    FavoriteCityEntity("Tokyo", "Japan", 13.0, "Showers", "icons/rain.png")
-                )
-                mockCities.forEach { weatherDao.insertFavoriteCity(it) }
             }
         }
     }

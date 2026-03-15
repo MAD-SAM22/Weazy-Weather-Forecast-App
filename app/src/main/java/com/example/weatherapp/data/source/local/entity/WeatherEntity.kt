@@ -21,7 +21,9 @@ data class FavoriteCityEntity(
     val country: String,
     val temp: Double,
     val condition: String,
-    val icon: String
+    val icon: String,
+    val lat: Double = 0.0,
+    val lon: Double = 0.0
 )
 
 @Entity(tableName = "weather_alerts")
