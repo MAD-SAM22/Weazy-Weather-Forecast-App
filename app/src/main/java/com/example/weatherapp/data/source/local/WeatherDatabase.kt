@@ -13,7 +13,7 @@ import com.example.weatherapp.data.source.local.entity.WeatherAlertEntity
         FavoriteCityEntity::class,
         WeatherAlertEntity::class
     ],
-    version = 2, // Incremented version
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(WeatherTypeConverters::class)

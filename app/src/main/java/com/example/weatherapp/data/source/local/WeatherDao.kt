@@ -36,6 +36,9 @@ interface WeatherDao {
     @Delete
     suspend fun deleteAlert(alert: WeatherAlertEntity)
 
+    @Query("DELETE FROM weather_alerts WHERE cityName = :cityName")
+    suspend fun deleteAlertByCity(cityName: String)
+
     @Query("UPDATE weather_alerts SET isEnabled = :enabled WHERE id = :alertId")
     suspend fun updateAlertStatus(alertId: Int, enabled: Boolean)
 }

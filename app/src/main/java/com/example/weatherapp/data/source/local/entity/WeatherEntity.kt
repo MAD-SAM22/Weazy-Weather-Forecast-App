@@ -31,7 +31,9 @@ data class WeatherAlertEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val cityName: String,
     val alertType: String, // e.g., "Alarm", "Notification"
-    val alertDate: Long,   // Storing as timestamp
-    val alertTime: String, // e.g., "08:00"
+    val alertDate: Long,
+    val alertTime: String,
+    val lat: Double = 0.0,
+    val lon: Double = 0.0,
     val isEnabled: Boolean = true
 )

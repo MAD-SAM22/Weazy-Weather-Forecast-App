@@ -63,24 +63,38 @@ class AlertsViewModel(
 
     fun addAlert(cityName: String, alertType: String, alertDate: Date, alertTime: String) {
         viewModelScope.launch {
+            // Get coordinates for the city to avoid "City Not Found" errors in the worker
+            var lat = 0.0
+            var lon = 0.0
+            try {
+                val geoResponse = repository.searchCity(cityName)
+                if (geoResponse.isSuccessful && geoResponse.body()?.isNotEmpty() == true) {
+                    lat = geoResponse.body()!![0].lat
+                    lon = geoResponse.body()!![0].lon
+                }
+            } catch (e: Exception) {
+                Log.e("AlertsViewModel", "Error resolving city coordinates", e)
+            }
+
             val entity = WeatherAlertEntity(
                 cityName = cityName,
                 alertType = alertType,
                 alertDate = alertDate.time,
-                alertTime = alertTime
+                alertTime = alertTime,
+                lat = lat,
+                lon = lon
             )
             val id = weatherDao.insertAlert(entity)
             
             // Schedule the worker
-            scheduleNotification(cityName, alertType, alertDate, alertTime, id.toInt())
+            scheduleNotification(cityName, alertType, alertDate, alertTime, id.toInt(), lat, lon)
         }
     }
 
-    private fun scheduleNotification(cityName: String, alertType: String, alertDate: Date, alertTime: String, alertId: Int) {
+    private fun scheduleNotification(cityName: String, alertType: String, alertDate: Date, alertTime: String, alertId: Int, lat: Double, lon: Double) {
         val calendar = Calendar.getInstance()
         val dateCalendar = Calendar.getInstance().apply { time = alertDate }
         
-        // Parse alertTime "HH:mm"
         val timeParts = alertTime.split(":")
         val hour = timeParts[0].toInt()
         val minute = timeParts[1].toInt()
@@ -97,7 +111,9 @@ class AlertsViewModel(
         if (delay > 0) {
             val data = workDataOf(
                 "city_name" to cityName,
-                "alert_type" to alertType
+                "alert_type" to alertType,
+                "lat" to lat,
+                "lon" to lon
             )
 
             val workRequest = OneTimeWorkRequestBuilder<WeatherNotificationWorker>()

@@ -28,6 +28,7 @@ import coil.request.ImageRequest
 import com.example.weatherapp.ui.home.components.AddCityDialog
 import com.example.weatherapp.ui.home.components.ForecastCard
 import com.example.weatherapp.ui.home.components.MapSelectionDialog
+import com.example.weatherapp.ui.utils.WeatherMapper
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -44,11 +45,17 @@ fun HomeScreen(
     var showAddCityDialog by remember { mutableStateOf(false) }
     var showMapDialog by remember { mutableStateOf(false) }
 
+    // Map weather state to theme
+    val theme = WeatherMapper.getTheme(
+        condition = weather?.weather?.firstOrNull()?.main,
+        iconCode = weather?.weather?.firstOrNull()?.icon
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image from Assets
+        // Background Image mapped from Weather state
         AsyncImage(
             model = ImageRequest.Builder(context)
-                .data("file:///android_asset/bg/night2.jpg")
+                .data("file:///android_asset/${theme.bgImage}")
                 .build(),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
@@ -93,10 +100,10 @@ fun HomeScreen(
                 )
             }
 
-            // House Image from Assets
+            // House Image mapped from Weather state
             AsyncImage(
                 model = ImageRequest.Builder(context)
-                    .data("file:///android_asset/houses/morning_or_night.png")
+                    .data("file:///android_asset/${theme.houseImage}")
                     .build(),
                 contentDescription = null,
                 modifier = Modifier
