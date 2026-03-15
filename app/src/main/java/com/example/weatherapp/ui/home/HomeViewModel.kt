@@ -43,12 +43,11 @@ class HomeViewModel(
             fetchWeatherData(lat, lon)
         }
         
-        // Safety timeout/fallback: if after 5 seconds we still have no data, load a default city
         viewModelScope.launch {
             kotlinx.coroutines.delay(5000)
             if (weatherState == null) {
-                Log.d("HomeViewModel", "Location timeout, falling back to default city")
-                fetchWeatherData("Egypt")
+                Log.d("HomeViewModel", "Location timeout or fetch pending, trying default city")
+                fetchWeatherData("London")
             }
         }
     }
@@ -59,6 +58,10 @@ class HomeViewModel(
                 val weatherResponse = repository.getCurrentWeatherByCoords(lat, lon)
                 if (weatherResponse.isSuccessful) {
                     weatherState = weatherResponse.body()
+                    Log.d("HomeViewModel", "Weather fetch successful for $lat, $lon")
+                } else {
+                    val errorMsg = weatherResponse.errorBody()?.string()
+                    Log.e("HomeViewModel", "Weather fetch failed (HTTP ${weatherResponse.code()}): $errorMsg")
                 }
 
                 val forecastResponse = repository.getForecastByCoords(lat, lon)
@@ -66,8 +69,7 @@ class HomeViewModel(
                     processForecast(forecastResponse.body())
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching weather by coords", e)
-                fetchWeatherData("Egypt") // Fallback on error
+                Log.e("HomeViewModel", "Exception fetching weather by coords: ${e.message}", e)
             }
         }
     }
@@ -78,6 +80,10 @@ class HomeViewModel(
                 val weatherResponse = repository.getWeatherByCity(city)
                 if (weatherResponse.isSuccessful) {
                     weatherState = weatherResponse.body()
+                    Log.d("HomeViewModel", "Weather fetch successful for $city")
+                } else {
+                    val errorMsg = weatherResponse.errorBody()?.string()
+                    Log.e("HomeViewModel", "Weather fetch failed for $city (HTTP ${weatherResponse.code()}): $errorMsg")
                 }
 
                 val forecastResponse = repository.getForecastByCity(city)
@@ -85,7 +91,7 @@ class HomeViewModel(
                     processForecast(forecastResponse.body())
                 }
             } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching weather by city", e)
+                Log.e("HomeViewModel", "Exception fetching weather by city: ${e.message}", e)
             }
         }
     }

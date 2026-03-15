@@ -28,7 +28,11 @@ import coil.request.ImageRequest
 import com.example.weatherapp.ui.home.components.ForecastCard
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onNavigateToCities: () -> Unit) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNavigateToCities: () -> Unit,
+    onNavigateToAlerts: () -> Unit
+) {
     val context = LocalContext.current
     val weather = viewModel.weatherState
     val isHourly = viewModel.isHourlySelected
@@ -177,7 +181,7 @@ fun HomeScreen(viewModel: HomeViewModel, onNavigateToCities: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* Handle Notifications */ }) {
+                IconButton(onClick = onNavigateToAlerts) {
                     Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
                 }
                 

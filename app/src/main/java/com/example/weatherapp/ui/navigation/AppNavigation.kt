@@ -11,6 +11,7 @@ import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.onboarding.OnboardingScreen
 import com.example.weatherapp.ui.onboarding.WeatherSplashScreen
 import com.example.weatherapp.ui.lovedcities.LovedCitiesScreen
+import com.example.weatherapp.ui.alerts.AlertsScreen
 import org.koin.androidx.compose.koinViewModel
 
 private const val PREFS_NAME = "weather_prefs"
@@ -21,6 +22,7 @@ private object Routes {
     const val ONBOARDING = "onboarding"
     const val HOME = "home"
     const val LOVED_CITIES = "loved_cities"
+    const val ALERTS = "alerts"
 }
 
 @Composable
@@ -55,12 +57,17 @@ fun AppNavigation() {
             val homeViewModel: HomeViewModel = koinViewModel()
             HomeScreen(
                 viewModel = homeViewModel,
-                onNavigateToCities = { navController.navigate(Routes.LOVED_CITIES) }
+                onNavigateToCities = { navController.navigate(Routes.LOVED_CITIES) },
+                onNavigateToAlerts = { navController.navigate(Routes.ALERTS) }
             )
         }
 
         composable(Routes.LOVED_CITIES) {
             LovedCitiesScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.ALERTS) {
+            AlertsScreen(onBack = { navController.popBackStack() })
         }
     }
 }
