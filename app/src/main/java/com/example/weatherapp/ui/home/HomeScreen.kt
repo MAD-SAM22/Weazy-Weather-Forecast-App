@@ -45,6 +45,7 @@ fun HomeScreen(
     val weather = viewModel.weatherState
     val isHourly = viewModel.isHourlySelected
     val forecastData = if (isHourly) viewModel.hourlyForecast else viewModel.weeklyForecast
+    val isLoading = viewModel.isLoading
     
     var showAddCityDialog by remember { mutableStateOf(false) }
     var showMapDialog by remember { mutableStateOf(false) }
@@ -237,6 +238,22 @@ fun HomeScreen(
 
                 IconButton(onClick = onNavigateToCities) {
                     Icon(Icons.Default.List, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
+                }
+            }
+        }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color.White)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = stringResource(R.string.loading), color = Color.White)
                 }
             }
         }

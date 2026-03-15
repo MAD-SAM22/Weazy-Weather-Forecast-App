@@ -45,6 +45,9 @@ class HomeViewModel(
     var searchResults by mutableStateOf<List<GeocodingResponseItem>>(emptyList())
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
     private var searchJob: Job? = null
     
     private var currentLat: Double? = null
@@ -83,6 +86,7 @@ class HomeViewModel(
     fun loadWeatherForCurrentLocation() {
         Log.d("HomeViewModel", "Loading weather for current location...")
         isFirstLoad = false
+        isLoading = true
         locationHelper.getDeviceLocation { lat, lon ->
             // Only update if we haven't manually selected a city from favorites in the meantime
             if (currentCity == null) {
@@ -90,6 +94,8 @@ class HomeViewModel(
                 currentLon = lon
                 Log.d("HomeViewModel", "Received location: $lat, $lon")
                 fetchWeatherData(lat, lon)
+            } else {
+                isLoading = false
             }
         }
         
@@ -182,6 +188,7 @@ class HomeViewModel(
         currentLat = lat
         currentLon = lon
         currentCity = null
+        isLoading = true
         viewModelScope.launch {
             try {
                 val weatherResponse = repository.getCurrentWeatherByCoords(lat, lon)
@@ -201,6 +208,8 @@ class HomeViewModel(
                 if (e !is kotlinx.coroutines.CancellationException) {
                     Log.e("HomeViewModel", "Exception fetching weather by coords: ${e.message}", e)
                 }
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -209,6 +218,7 @@ class HomeViewModel(
         currentCity = city
         currentLat = null
         currentLon = null
+        isLoading = true
         viewModelScope.launch {
             try {
                 val weatherResponse = repository.getWeatherByCity(city)
@@ -228,6 +238,8 @@ class HomeViewModel(
                 if (e !is kotlinx.coroutines.CancellationException) {
                     Log.e("HomeViewModel", "Exception fetching weather by city: ${e.message}", e)
                 }
+            } finally {
+                isLoading = false
             }
         }
     }
