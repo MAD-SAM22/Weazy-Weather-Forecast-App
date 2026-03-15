@@ -2,6 +2,7 @@ package com.example.weatherapp.data.source.remote
 
 import com.example.weatherapp.data.model.CurrentWeatherModel
 import com.example.weatherapp.data.model.ForecastResponse
+import com.example.weatherapp.data.model.GeocodingResponseItem
 import com.example.weatherapp.data.model.UnsplashResponse
 import retrofit2.Response
 
@@ -11,6 +12,7 @@ interface WeatherRemoteDataSource {
     suspend fun getForecastByCoords(lat: Double, lon: Double): Response<ForecastResponse>
     suspend fun getForecastByCity(city: String): Response<ForecastResponse>
     suspend fun getCityImage(city: String): Response<UnsplashResponse>
+    suspend fun searchCity(query: String): Response<List<GeocodingResponseItem>>
 }
 
 class WeatherRemoteDataSourceImpl(
@@ -39,5 +41,9 @@ class WeatherRemoteDataSourceImpl(
 
     override suspend fun getCityImage(city: String): Response<UnsplashResponse> {
         return unsplashApiService.searchPhotos(query = "$city cityscape", clientId = UNSPLASH_CLIENT_ID)
+    }
+
+    override suspend fun searchCity(query: String): Response<List<GeocodingResponseItem>> {
+        return apiService.searchCity(cityName = query, apiKey = API_KEY)
     }
 }

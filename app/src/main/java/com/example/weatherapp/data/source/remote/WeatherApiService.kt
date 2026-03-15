@@ -1,5 +1,12 @@
 package com.example.weatherapp.data.source.remote
 
+import com.example.weatherapp.data.model.CurrentWeatherModel
+import com.example.weatherapp.data.model.ForecastResponse
+import com.example.weatherapp.data.model.GeocodingResponseItem
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Query
+
 // unites of messure : standard, metric, or imperial
 //units=metric&lang=ar
 
@@ -16,13 +23,6 @@ package com.example.weatherapp.data.source.remote
 
 //4. 5-Day Forecast by city
 //https://api.openweathermap.org/data/2.5/forecast?q=London&appid=037a373011c520cc888756c98e9d9260&units=metric
-
-
-import com.example.weatherapp.data.model.CurrentWeatherModel
-import com.example.weatherapp.data.model.ForecastResponse
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface WeatherApiService {
 
@@ -45,4 +45,11 @@ interface WeatherApiService {
         @Query("units") units: String = "metric",
         @Query("lang") lang: String = "en"
     ): Response<ForecastResponse>
+
+    @GET("https://api.openweathermap.org/geo/1.0/direct")
+    suspend fun searchCity(
+        @Query("q") cityName: String,
+        @Query("limit") limit: Int = 5,
+        @Query("appid") apiKey: String
+    ): Response<List<GeocodingResponseItem>>
 }

@@ -48,7 +48,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { LovedCitiesViewModel(get(), get()) }
     viewModel { AlertsViewModel(get()) }
 }

@@ -9,15 +9,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.model.CurrentWeatherModel
 import com.example.weatherapp.data.model.ForecastDisplayItem
 import com.example.weatherapp.data.model.ForecastResponse
+import com.example.weatherapp.data.model.GeocodingResponseItem
 import com.example.weatherapp.data.repository.WeatherRepository
+import com.example.weatherapp.data.source.local.WeatherDao
+import com.example.weatherapp.data.source.local.entity.FavoriteCityEntity
 import com.example.weatherapp.data.source.remote.LocationHelper
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HomeViewModel(
     private val repository: WeatherRepository,
-    private val locationHelper: LocationHelper
+    private val locationHelper: LocationHelper,
+    private val weatherDao: WeatherDao
 ) : ViewModel() {
 
     var weatherState by mutableStateOf<CurrentWeatherModel?>(null)
@@ -32,6 +38,11 @@ class HomeViewModel(
     var isHourlySelected by mutableStateOf(true)
         private set
 
+    var searchResults by mutableStateOf<List<GeocodingResponseItem>>(emptyList())
+        private set
+
+    private var searchJob: Job? = null
+
     init {
         loadWeatherForCurrentLocation()
     }
@@ -44,10 +55,53 @@ class HomeViewModel(
         }
         
         viewModelScope.launch {
-            kotlinx.coroutines.delay(5000)
+            delay(5000)
             if (weatherState == null) {
                 Log.d("HomeViewModel", "Location timeout or fetch pending, trying default city")
                 fetchWeatherData("London")
+            }
+        }
+    }
+
+    fun searchCities(query: String) {
+        searchJob?.cancel()
+        if (query.length < 3) {
+            searchResults = emptyList()
+            return
+        }
+        searchJob = viewModelScope.launch {
+            delay(500)
+            try {
+                val response = repository.searchCity(query)
+                if (response.isSuccessful) {
+                    searchResults = response.body() ?: emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error searching cities", e)
+            }
+        }
+    }
+
+    fun addCityToFavorites(city: GeocodingResponseItem) {
+        viewModelScope.launch {
+            try {
+                val weatherResponse = repository.getWeatherByCity(city.name)
+                if (weatherResponse.isSuccessful) {
+                    val weather = weatherResponse.body()
+                    if (weather != null) {
+                        weatherDao.insertFavoriteCity(
+                            FavoriteCityEntity(
+                                name = city.name,
+                                country = city.country,
+                                temp = weather.main.temp,
+                                condition = weather.weather.firstOrNull()?.description ?: "",
+                                icon = mapIconToAsset(weather.weather.firstOrNull()?.icon)
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error adding city to favorites", e)
             }
         }
     }
