@@ -12,6 +12,7 @@ import com.example.weatherapp.data.source.remote.WeatherApiService
 import com.example.weatherapp.data.source.remote.WeatherRemoteDataSource
 import com.example.weatherapp.data.source.remote.WeatherRemoteDataSourceImpl
 import com.example.weatherapp.data.source.remote.LocationHelper
+import com.example.weatherapp.ui.alerts.AlertsViewModel
 import org.koin.android.ext.koin.androidContext
 
 val networkModule = module {
@@ -35,6 +36,7 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModel { HomeViewModel(get(), get()) }
+    viewModel { AlertsViewModel(get()) }
 }
 
 val databaseModule = module {
