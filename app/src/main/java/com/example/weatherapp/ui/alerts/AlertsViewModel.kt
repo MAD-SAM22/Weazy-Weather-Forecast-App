@@ -25,7 +25,7 @@ class AlertsViewModel(private val weatherDao: WeatherDao) : ViewModel() {
                 WeatherAlertEntity(
                     cityName = cityName,
                     alertType = alertType,
-                    alertDate = alertDate,
+                    alertDate = alertDate.time, // Convert Date to Long
                     alertTime = alertTime
                 )
             )

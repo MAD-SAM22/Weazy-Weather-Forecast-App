@@ -2,11 +2,10 @@ package com.example.weatherapp.data.source.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "current_weather")
 data class CurrentWeatherEntity(
-    @PrimaryKey val id: Int = 1, // Only one current weather record
+    @PrimaryKey val id: Int = 1,
     val cityName: String,
     val temp: Double,
     val tempMax: Double,
@@ -29,8 +28,8 @@ data class FavoriteCityEntity(
 data class WeatherAlertEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val cityName: String,
-    val alertType: String, // e.g., "Ring", "notification"
-    val alertDate: Date,
+    val alertType: String, // e.g., "Alarm", "Notification"
+    val alertDate: Long,   // Storing as timestamp
     val alertTime: String, // e.g., "08:00"
     val isEnabled: Boolean = true
 )

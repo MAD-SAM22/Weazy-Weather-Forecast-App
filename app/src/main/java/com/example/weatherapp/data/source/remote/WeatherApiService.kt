@@ -6,7 +6,6 @@ import com.example.weatherapp.data.model.GeocodingResponseItem
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
-
 // unites of messure : standard, metric, or imperial
 //units=metric&lang=ar
 
@@ -50,6 +49,14 @@ interface WeatherApiService {
     suspend fun searchCity(
         @Query("q") cityName: String,
         @Query("limit") limit: Int = 5,
+        @Query("appid") apiKey: String
+    ): Response<List<GeocodingResponseItem>>
+
+    @GET("https://api.openweathermap.org/geo/1.0/reverse")
+    suspend fun reverseGeocode(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("limit") limit: Int = 1,
         @Query("appid") apiKey: String
     ): Response<List<GeocodingResponseItem>>
 }

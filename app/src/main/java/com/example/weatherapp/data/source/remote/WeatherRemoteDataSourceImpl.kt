@@ -13,6 +13,7 @@ interface WeatherRemoteDataSource {
     suspend fun getForecastByCity(city: String): Response<ForecastResponse>
     suspend fun getCityImage(city: String): Response<UnsplashResponse>
     suspend fun searchCity(query: String): Response<List<GeocodingResponseItem>>
+    suspend fun reverseGeocode(lat: Double, lon: Double): Response<List<GeocodingResponseItem>>
 }
 
 class WeatherRemoteDataSourceImpl(
@@ -45,5 +46,9 @@ class WeatherRemoteDataSourceImpl(
 
     override suspend fun searchCity(query: String): Response<List<GeocodingResponseItem>> {
         return apiService.searchCity(cityName = query, apiKey = API_KEY)
+    }
+
+    override suspend fun reverseGeocode(lat: Double, lon: Double): Response<List<GeocodingResponseItem>> {
+        return apiService.reverseGeocode(lat = lat, lon = lon, apiKey = API_KEY)
     }
 }

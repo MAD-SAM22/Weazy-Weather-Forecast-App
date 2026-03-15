@@ -32,4 +32,8 @@ class WeatherRepository(private val remoteDataSource: WeatherRemoteDataSource) {
     suspend fun searchCity(query: String): Response<List<GeocodingResponseItem>> {
         return remoteDataSource.searchCity(query)
     }
+
+    suspend fun reverseGeocode(lat: Double, lon: Double): Response<List<GeocodingResponseItem>> {
+        return remoteDataSource.reverseGeocode(lat, lon)
+    }
 }

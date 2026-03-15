@@ -27,6 +27,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.weatherapp.ui.home.components.AddCityDialog
 import com.example.weatherapp.ui.home.components.ForecastCard
+import com.example.weatherapp.ui.home.components.MapSelectionDialog
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun HomeScreen(
@@ -38,7 +40,9 @@ fun HomeScreen(
     val weather = viewModel.weatherState
     val isHourly = viewModel.isHourlySelected
     val forecastData = if (isHourly) viewModel.hourlyForecast else viewModel.weeklyForecast
+    
     var showAddCityDialog by remember { mutableStateOf(false) }
+    var showMapDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Background Image from Assets
@@ -228,9 +232,19 @@ fun HomeScreen(
                     showAddCityDialog = false
                 },
                 onSelectOnMap = {
-                    // Logic for map selection can go here
-                    // For now, it will just dismiss the dialog
                     showAddCityDialog = false
+                    showMapDialog = true
+                }
+            )
+        }
+
+        if (showMapDialog) {
+            MapSelectionDialog(
+                initialLocation = GeoPoint(30.0444, 31.2357), // Using GeoPoint
+                onDismiss = { showMapDialog = false },
+                onLocationConfirmed = { geoPoint ->
+                    viewModel.addLocationToFavorites(geoPoint.latitude, geoPoint.longitude)
+                    showMapDialog = false
                 }
             )
         }

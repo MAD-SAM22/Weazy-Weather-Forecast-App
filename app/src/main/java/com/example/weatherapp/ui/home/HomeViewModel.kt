@@ -106,6 +106,37 @@ class HomeViewModel(
         }
     }
 
+    fun addLocationToFavorites(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            try {
+                // 1. Reverse Geocode to get city name
+                val geoResponse = repository.reverseGeocode(lat, lon)
+                if (geoResponse.isSuccessful && geoResponse.body()?.isNotEmpty() == true) {
+                    val cityInfo = geoResponse.body()!![0]
+                    
+                    // 2. Fetch weather for that city
+                    val weatherResponse = repository.getCurrentWeatherByCoords(lat, lon)
+                    if (weatherResponse.isSuccessful) {
+                        val weather = weatherResponse.body()
+                        if (weather != null) {
+                            weatherDao.insertFavoriteCity(
+                                FavoriteCityEntity(
+                                    name = cityInfo.name,
+                                    country = cityInfo.country,
+                                    temp = weather.main.temp,
+                                    condition = weather.weather.firstOrNull()?.description ?: "",
+                                    icon = mapIconToAsset(weather.weather.firstOrNull()?.icon)
+                                )
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error adding location to favorites", e)
+            }
+        }
+    }
+
     private fun fetchWeatherData(lat: Double, lon: Double) {
         viewModelScope.launch {
             try {
