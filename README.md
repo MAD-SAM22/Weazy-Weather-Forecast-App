@@ -7,9 +7,8 @@ A premium, modern weather application built with Jetpack Compose, offering real-
 ## ✨ Preview
 
 <p align="center">
-  <img src="assets/app_ui_mockup.png" alt="App UI Mockup" width="300"/>
+  <img src="assets/app_ui_mockup.png" alt="App UI Mockup" />
   <br>
-  <i>(Replace the image path above with your own asset)</i>
 </p>
 
 ---
@@ -42,10 +41,9 @@ A premium, modern weather application built with Jetpack Compose, offering real-
 
 ## 📸 Screenshots
 
-| Splash & Onboarding | Home Screen | Weather Details |
+| Splash & Onboarding | Home Screen | Loved cities |
 | :---: | :---: | :---: |
-| <img src="assets/onboarding.png" width="200" alt="Onboarding"/> | <img src="assets/home.png" width="200" alt="Home"/> |
-| *Placeholders* | *Placeholders* |
+| <img src="assets/onboarding.png" width="400" alt="Onboarding"/> | <img src="assets/home.png" width="400" alt="Home"/> | <img src="assets/loved_cities.png" width="400" alt="Loved cities"/> |
 
 ---
 
